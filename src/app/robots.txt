@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://coisacomputers.co.ke/sitemap.xml
