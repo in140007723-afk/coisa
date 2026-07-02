@@ -102,20 +102,8 @@ const fallbackEnquiries: Enquiry[] = [
 
 const fallbackAdmins: AdminUser[] = [];
 
-function getSeedAdmin(): AdminUser {
-  return {
-    id: "admin-1",
-    name: "System Admin",
-    email: "coisacomputers@gmail.com",
-    password: bcrypt.hashSync("admin123", 10),
-    profileImage: "",
-    role: "admin",
-    createdAt: new Date().toISOString(),
-  };
-}
-
 const fallbackState = {
-  admins: fallbackAdmins.length ? fallbackAdmins : [getSeedAdmin()],
+  admins: fallbackAdmins,
   products: fallbackProducts,
   categories: fallbackCategories,
   enquiries: fallbackEnquiries,
@@ -274,7 +262,7 @@ export async function getAdminByEmail(email: string) {
   if (rows && rows.length) {
     return rows[0] as AdminUser;
   }
-  return fallbackState.admins.find((admin) => admin.email.toLowerCase() === email.toLowerCase()) || null;
+  return null;
 }
 
 export async function verifyAdminPassword(password: string, hash: string) {
@@ -497,21 +485,3 @@ export async function getDashboardStats() {
   };
 }
 
-export async function seedAdminIfNeeded() {
-  const admin = await getAdminByEmail("coisacomputers@gmail.com");
-  if (!admin) {
-    const hashedPassword = await hashPassword("admin123");
-    const insertResult = await queryDb<any>("INSERT INTO admins (name, email, password, role, created_at) VALUES (?, ?, ?, ?, NOW())", ["System Admin", "coisacomputers@gmail.com", hashedPassword, "admin"]);
-    if (insertResult && typeof insertResult === "object" && "insertId" in insertResult) {
-      fallbackState.admins.unshift({
-        id: String((insertResult as any).insertId),
-        name: "System Admin",
-        email: "coisacomputers@gmail.com",
-        password: hashedPassword,
-        profileImage: "",
-        role: "admin",
-        createdAt: new Date().toISOString(),
-      });
-    }
-  }
-}
