@@ -1,28 +1,5 @@
 [
   {
-    "name": "Macbook",
-    "categoryId": "3",
-    "categoryName": "Laptops",
-    "brand": "Apple",
-    "model": "",
-    "description": "m2chip",
-    "specifications": "16GB RAM\ncorei7\n8th Gen\n256SSD",
-    "price": 35000,
-    "discountPrice": 1000,
-    "stockQuantity": 9998,
-    "images": [
-      "/uploads/1782986992759-lb.jpg",
-      "/uploads/1782987005155-ll.jpg"
-    ],
-    "featured": true,
-    "status": "active",
-    "sku": "",
-    "tags": [],
-    "warranty": "1 year",
-    "id": "6",
-    "createdAt": "2026-07-02T10:10:27.310Z"
-  },
-  {
     "id": "prod-1",
     "name": "Dell Latitude 7440",
     "categoryId": "cat-1",
@@ -45,6 +22,6 @@
       "premium"
     ],
     "warranty": "1 year",
-    "createdAt": "2026-07-02T10:10:27.099Z"
+    "createdAt": "2026-07-03T02:30:32.859Z"
   }
 ]

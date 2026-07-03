@@ -115,7 +115,7 @@ export async function DELETE(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
-
+``
     if (!id) {
       return NextResponse.json({ error: "Product ID required" }, { status: 400 });
     }

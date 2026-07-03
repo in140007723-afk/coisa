@@ -11,6 +11,7 @@ export async function getDbConnection() {
   const user = process.env.DB_USER?.trim() || "root";
   const password = process.env.DB_PASSWORD ?? "";
   const database = process.env.DB_NAME?.trim();
+  const port = parseInt(process.env.DB_PORT || "3306");
 
   if (!host || !user || !database) {
     return null;
@@ -18,6 +19,7 @@ export async function getDbConnection() {
 
   pool = mysql.createPool({
     host,
+    port,
     user,
     password,
     database,
