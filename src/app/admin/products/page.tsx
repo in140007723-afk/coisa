@@ -49,14 +49,14 @@ export default function AdminProductsPage() {
   const [uploading, setUploading] = useState(false);
 
   async function loadProducts() {
-    const response = await fetch("/api/admin/products");
+    const response = await fetch("/api/admin/products", { credentials: "include" });
     const data = await response.json();
     setProducts(data.products || []);
   }
 
   async function loadCategories() {
     try {
-      const res = await fetch("/api/admin/categories");
+      const res = await fetch("/api/admin/categories", { credentials: "include" });
       if (res.ok) {
         const payload = await res.json();
         setCategories(payload.categories || []);
@@ -82,7 +82,7 @@ export default function AdminProductsPage() {
     setUploading(true);
     const body = new FormData();
     body.append("file", file);
-    const response = await fetch("/api/admin/upload", { method: "POST", body });
+    const response = await fetch("/api/admin/upload", { method: "POST", body, credentials: "include" });
     const data = await response.json();
     setUploading(false);
     if (data.success) {
@@ -102,7 +102,7 @@ export default function AdminProductsPage() {
     };
     const url = editingId ? "/api/admin/products" : "/api/admin/products";
     const method = editingId ? "PUT" : "POST";
-    const response = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(editingId ? { ...payload, id: editingId } : payload) });
+    const response = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(editingId ? { ...payload, id: editingId } : payload), credentials: "include" });
     if (response.ok) {
       setForm(emptyForm);
       setEditingId(null);
@@ -111,7 +111,7 @@ export default function AdminProductsPage() {
   }
 
   async function handleDelete(id: string) {
-    await fetch("/api/admin/products", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) });
+    await fetch("/api/admin/products", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }), credentials: "include" });
     loadProducts();
   }
 

@@ -1,16 +1,32 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { AdminThemeToggle } from "@/components/admin-theme-toggle";
 
-async function checkServerSession(): Promise<boolean> {
+async function checkServerSession(): Promise<"authenticated" | "unauthenticated" | "unknown"> {
   try {
-    const res = await fetch("/api/auth/verify", { cache: "no-store", credentials: "include" });
-    return res.ok;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 4000);
+    const res = await fetch("/api/auth/verify", {
+      cache: "no-store",
+      credentials: "include",
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
+
+    if (res.ok) {
+      return "authenticated";
+    }
+
+    if (res.status === 401 || res.status === 403) {
+      return "unauthenticated";
+    }
+
+    return "unknown";
   } catch {
-    return false;
+    return "unknown";
   }
 }
 
@@ -19,18 +35,36 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const [isReady, setIsReady] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const lastCheckedPathRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (pathname === "/admin/login") {
+      lastCheckedPathRef.current = pathname;
       setIsReady(true);
       setIsAuthenticated(true);
       return;
     }
+
+    if (lastCheckedPathRef.current === pathname) {
+      return;
+    }
+
+    lastCheckedPathRef.current = pathname;
+
     let mounted = true;
     (async () => {
-      const ok = await checkServerSession();
+      const result = await checkServerSession();
       if (!mounted) return;
-      if (!ok) {
+
+      if (result === "authenticated") {
+        setIsAuthenticated(true);
+        setIsReady(true);
+        return;
+      }
+
+      if (result === "unauthenticated") {
+        setIsAuthenticated(false);
+        setIsReady(true);
         router.replace("/admin/login");
         return;
       }

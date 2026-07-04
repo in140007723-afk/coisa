@@ -18,7 +18,7 @@ export default function AdminCategoriesPage() {
   const [uploading, setUploading] = useState(false);
 
   async function loadCategories() {
-    const response = await fetch("/api/admin/categories");
+    const response = await fetch("/api/admin/categories", { credentials: "include" });
     const data = await response.json();
     setCategories(data.categories || []);
   }
@@ -33,7 +33,7 @@ export default function AdminCategoriesPage() {
     setUploading(true);
     const body = new FormData();
     body.append("file", file);
-    const response = await fetch("/api/admin/upload", { method: "POST", body });
+    const response = await fetch("/api/admin/upload", { method: "POST", body, credentials: "include" });
     const data = await response.json();
     setUploading(false);
     if (data.success) {
@@ -44,7 +44,7 @@ export default function AdminCategoriesPage() {
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     const method = editingId ? "PUT" : "POST";
-    const response = await fetch("/api/admin/categories", { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(editingId ? { ...form, id: editingId } : form) });
+    const response = await fetch("/api/admin/categories", { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(editingId ? { ...form, id: editingId } : form), credentials: "include" });
     if (response.ok) {
       setForm(emptyForm);
       setEditingId(null);
@@ -58,7 +58,7 @@ export default function AdminCategoriesPage() {
   }
 
   async function handleDelete(id: string) {
-    await fetch("/api/admin/categories", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) });
+    await fetch("/api/admin/categories", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }), credentials: "include" });
     await loadCategories();
     try {
       window.dispatchEvent(new CustomEvent("categories-updated"));

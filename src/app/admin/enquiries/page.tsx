@@ -20,7 +20,7 @@ export default function AdminEnquiriesPage() {
   const [reply, setReply] = useState("");
 
   async function loadEnquiries() {
-    const response = await fetch("/api/admin/enquiries");
+    const response = await fetch("/api/admin/enquiries", { credentials: "include" });
     const data = await response.json();
     setEnquiries(data.enquiries || []);
   }
@@ -30,18 +30,18 @@ export default function AdminEnquiriesPage() {
   }, []);
 
   async function updateStatus(id: string, status: string) {
-    await fetch("/api/admin/enquiries", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, status }) });
+    await fetch("/api/admin/enquiries", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, status }), credentials: "include" });
     loadEnquiries();
   }
 
   async function submitReply(id: string) {
-    await fetch("/api/admin/enquiries", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, adminReply: reply, status: "Replied" }) });
+    await fetch("/api/admin/enquiries", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, adminReply: reply, status: "Replied" }), credentials: "include" });
     setReply("");
     loadEnquiries();
   }
 
   async function handleDelete(id: string) {
-    await fetch("/api/admin/enquiries", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) });
+    await fetch("/api/admin/enquiries", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }), credentials: "include" });
     loadEnquiries();
   }
 

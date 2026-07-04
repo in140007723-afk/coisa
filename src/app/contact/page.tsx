@@ -65,6 +65,8 @@ export default function ContactPage() {
               <div>
                 <p className="font-semibold text-slate-900">Phone</p>
                 <div className="mt-1 space-y-1 text-[#0066FF]">
+                  <a href="tel:0709424843" className="block">0709424843</a>
+                  <a href="tel:+254709424843" className="block">+254 709 424 843</a>
                   <a href="tel:+254728953325" className="block">+254 728 953 325</a>
                   <a href="tel:+254705656849" className="block">+254 705 656 849</a>
                 </div>
