@@ -11,7 +11,10 @@ export async function getDbConnection() {
   const user = process.env.DB_USER?.trim() || "root";
   const password = process.env.DB_PASSWORD ?? "";
   const database = process.env.DB_NAME?.trim();
-  const port = parseInt(process.env.DB_PORT || "3306");
+  const port = parseInt(process.env.DB_PORT || "3306", 10);
+  const useSsl = ["1", "true", "yes", "on"].includes(
+    (process.env.DB_SSL || "").toLowerCase().trim()
+  );
 
   if (!host || !user || !database) {
     return null;
@@ -26,6 +29,7 @@ export async function getDbConnection() {
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
+    ...(useSsl ? { ssl: { rejectUnauthorized: false } } : {}),
   });
 
   return pool;
