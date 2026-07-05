@@ -1,4 +1,3 @@
-import { Clock3, Facebook, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
@@ -23,11 +22,11 @@ export function SiteShell({
   description: string;
 }) {
   return (
-    <div className="min-h-screen bg-transparent text-slate-100">
-      <header className="sticky top-0 z-50 border-b border-blue-500/30 bg-[#071120]/95 text-white shadow-[0_12px_40px_-20px_rgba(0,102,255,0.45)] backdrop-blur-xl">
+    <div className="min-h-screen bg-gradient-to-br from-sky-100 via-blue-50 to-cyan-50 text-slate-800">
+      <header className="sticky top-0 z-50 border-b border-blue-200/70 bg-blue-950/95 text-white backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
           <Link href="/" className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl border border-cyan-400/70 bg-gradient-to-br from-[#0066FF] to-[#00C2FF] shadow-lg shadow-blue-500/20">
+            <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl border border-blue-300/70 bg-white shadow-sm">
               <Image src="/logo.png.jpeg" alt="Coisa Computers logo" width={48} height={48} className="h-full w-full object-contain" unoptimized />
             </div>
             <div>
@@ -38,7 +37,7 @@ export function SiteShell({
 
           <nav className="hidden items-center gap-6 text-sm font-medium text-blue-100 md:flex">
             {navLinks.map((link) => (
-              <Link key={link.href} href={link.href} className="transition hover:text-white hover:underline decoration-cyan-400 decoration-2 underline-offset-4">
+              <Link key={link.href} href={link.href} className="transition hover:text-white">
                 {link.label}
               </Link>
             ))}
@@ -46,7 +45,7 @@ export function SiteShell({
 
           <Link
             href="/contact"
-            className="rounded-full bg-gradient-to-r from-[#0066FF] to-[#00C2FF] px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 transition hover:translate-y-[-1px] hover:shadow-xl"
+            className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-blue-900 transition hover:bg-blue-100"
           >
             Request Quote
           </Link>
@@ -54,13 +53,13 @@ export function SiteShell({
       </header>
 
       <main>
-        <section className="border-b border-blue-500/20 bg-[radial-gradient(circle_at_top_left,_rgba(0,102,255,0.28),_transparent_24%),linear-gradient(135deg,_#071120_0%,_#103a78_45%,_#0e59c6_100%)]">
+        <section className="border-b border-blue-200/70 bg-gradient-to-br from-[#dbeafe] via-[#eff6ff] to-[#e0f2fe]">
           <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
             <div className="max-w-3xl">
-              <p className="mb-4 inline-flex rounded-full border border-cyan-400/40 bg-white/10 px-3 py-1 text-sm font-semibold text-cyan-200">
+              <p className="mb-4 inline-flex rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-sm font-semibold text-[#0066FF]">
                 {title}
               </p>
-              <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl lg:text-5xl">
+              <h1 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">
                 {description}
               </h1>
             </div>
@@ -69,7 +68,7 @@ export function SiteShell({
         {children}
       </main>
 
-      <footer className="border-t border-blue-500/30 bg-[#071120] text-slate-300">
+      <footer className="border-t border-blue-200 bg-blue-950 text-slate-300">
         <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-3 lg:px-8">
           <div>
             <p className="text-lg font-semibold text-white">Coisa Computers</p>
@@ -91,31 +90,13 @@ export function SiteShell({
           </div>
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-400">Contact</p>
-            <ul className="mt-4 space-y-3 text-sm">
-              <li className="flex items-center gap-2">
-                <Phone className="h-4 w-4 text-cyan-300" />
-                <a href="tel:+254709424843" className="transition hover:text-white">+254 709 424 843</a>
-              </li>
-              <li className="flex items-center gap-2">
-                <MessageCircle className="h-4 w-4 text-cyan-300" />
-                <a href="https://wa.me/254709424843" target="_blank" rel="noreferrer" className="transition hover:text-white">WhatsApp: +254 709 424 843</a>
-              </li>
-              <li className="flex items-center gap-2">
-                <Facebook className="h-4 w-4 text-cyan-300" />
-                <a href="https://www.facebook.com/coisacomputers" target="_blank" rel="noreferrer" className="transition hover:text-white">Facebook: Coisa Computers</a>
-              </li>
-              <li className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-cyan-300" />
-                <span>Kericho, Opposite Huduma Centre Kericho Parking Gate</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-cyan-300" />
-                <a href="mailto:coisacomputers@gmail.com" className="transition hover:text-white">coisacomputers@gmail.com</a>
-              </li>
-              <li className="flex items-center gap-2">
-                <Clock3 className="h-4 w-4 text-cyan-300" />
-                <span>Mon–Sat: 8:00 AM – 7:00 PM | Sun: 2:00 PM – 7:00 PM</span>
-              </li>
+            <ul className="mt-4 space-y-2 text-sm">
+              <li><a href="tel:+254709424843" className="transition hover:text-white">+254 709 424 843</a></li>
+              <li><a href="mailto:coisacomputers@gmail.com" className="transition hover:text-white">coisacomputers@gmail.com</a></li>
+              <li><a href="https://wa.me/254709424843" target="_blank" rel="noreferrer" className="transition hover:text-white">WhatsApp: +254 709 424 843</a></li>
+              <li><a href="https://www.facebook.com/coisacomputers" target="_blank" rel="noreferrer" className="transition hover:text-white">Facebook: Coisa Computers</a></li>
+              <li>Kericho, Opposite Huduma Centre Kericho Parking Gate</li>
+              <li>Mon–Sat: 8:00 AM – 7:00 PM | Sun: 2:00 PM – 7:00 PM</li>
             </ul>
           </div>
         </div>

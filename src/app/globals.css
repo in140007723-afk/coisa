@@ -3,49 +3,6 @@
 :root {
   --background: #f4f9ff;
   --foreground: #0f172a;
-  --site-surface: #f8fbff;
-  --site-surface-strong: #ffffff;
-  --site-border: #dfe7f2;
-  --site-muted: #64748b;
-  --admin-bg: #f8fafc;
-  --admin-panel: #ffffff;
-  --admin-panel-strong: #f8fafc;
-  --admin-border: #e2e8f0;
-  --admin-text: #0f172a;
-  --admin-muted: #64748b;
-  --admin-input: #ffffff;
-}
-
-:root[data-theme='light'] {
-  --background: #f4f9ff;
-  --foreground: #0f172a;
-  --site-surface: #f8fbff;
-  --site-surface-strong: #ffffff;
-  --site-border: #dfe7f2;
-  --site-muted: #64748b;
-  --admin-bg: #f8fafc;
-  --admin-panel: #ffffff;
-  --admin-panel-strong: #f8fafc;
-  --admin-border: #e2e8f0;
-  --admin-text: #0f172a;
-  --admin-muted: #64748b;
-  --admin-input: #ffffff;
-}
-
-:root[data-theme='dark'] {
-  --background: #020617;
-  --foreground: #f8fafc;
-  --site-surface: #020617;
-  --site-surface-strong: #0f172a;
-  --site-border: #1e293b;
-  --site-muted: #94a3b8;
-  --admin-bg: #020617;
-  --admin-panel: #0f172a;
-  --admin-panel-strong: #111827;
-  --admin-border: #334155;
-  --admin-text: #f8fafc;
-  --admin-muted: #94a3b8;
-  --admin-input: #111827;
 }
 
 @theme inline {
@@ -69,59 +26,9 @@ body {
   margin: 0;
   min-width: 0;
   width: 100%;
-  background:
-    radial-gradient(circle at top left, rgba(0, 102, 255, 0.24), transparent 28%),
-    linear-gradient(135deg, #0b1630 0%, #0f2b5f 38%, #0c5dd8 100%);
+  background: linear-gradient(135deg, #e8f3ff 0%, #f8fbff 45%, #dbeafe 100%);
   color: var(--foreground);
   font-family: var(--font-inter), Arial, Helvetica, sans-serif;
-}
-
-.admin-shell {
-  background: var(--admin-bg);
-  color: var(--admin-text);
-}
-
-.admin-shell .bg-slate-950,
-.admin-shell .bg-slate-900,
-.admin-shell .bg-slate-900\/90,
-.admin-shell .bg-slate-900\/80,
-.admin-shell .bg-slate-800,
-.admin-shell .bg-slate-800\/60,
-.admin-shell .bg-slate-950\/80 {
-  background-color: var(--admin-panel) !important;
-}
-
-.admin-shell .border-slate-800,
-.admin-shell .border-slate-700,
-.admin-shell .border-slate-600 {
-  border-color: var(--admin-border) !important;
-}
-
-.admin-shell .text-white,
-.admin-shell .text-slate-100,
-.admin-shell .text-slate-900 {
-  color: var(--admin-text) !important;
-}
-
-.admin-shell .text-slate-300,
-.admin-shell .text-slate-400,
-.admin-shell .text-slate-500,
-.admin-shell .text-slate-600,
-.admin-shell .text-slate-700 {
-  color: var(--admin-muted) !important;
-}
-
-.admin-shell input,
-.admin-shell textarea,
-.admin-shell select {
-  background-color: var(--admin-input) !important;
-  color: var(--admin-text) !important;
-  border-color: var(--admin-border) !important;
-}
-
-.admin-shell button,
-.admin-shell a {
-  transition: all 180ms ease;
 }
 
 img,

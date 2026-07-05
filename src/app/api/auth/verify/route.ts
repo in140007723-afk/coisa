@@ -3,7 +3,8 @@ import { getAdminSessionToken, verifySessionToken } from "@/lib/auth";
 
 export async function GET(request: Request) {
   const cookieHeader = request.headers.get("cookie") || "";
-  const token = getAdminSessionToken(cookieHeader);
+  const authHeader = request.headers.get("authorization") || "";
+  const token = getAdminSessionToken(cookieHeader, authHeader);
 
   if (!token) {
     return NextResponse.json({ success: false, error: "No auth token" }, { status: 401 });

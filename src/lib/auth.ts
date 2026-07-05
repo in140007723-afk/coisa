@@ -45,7 +45,18 @@ export function createNonce() {
   return randomBytes(16).toString("hex");
 }
 
-export function getAdminSessionToken(cookieHeader?: string | null) {
+export function getAdminSessionToken(cookieHeader?: string | null, authHeader?: string | null) {
+  if (!cookieHeader && !authHeader) {
+    return null;
+  }
+
+  if (authHeader) {
+    const headerValue = authHeader.replace(/^Bearer\s+/i, "").trim();
+    if (headerValue) {
+      return decodeURIComponent(headerValue);
+    }
+  }
+
   if (!cookieHeader) {
     return null;
   }
@@ -57,11 +68,6 @@ export function getAdminSessionToken(cookieHeader?: string | null) {
       const value = cookie.slice(cookieName.length + 1).trim();
       return decodeURIComponent(value);
     }
-  }
-
-  const authHeader = cookieHeader.match(/authorization\s*=\s*([^;]+)/i);
-  if (authHeader?.[1]) {
-    return decodeURIComponent(authHeader[1].trim());
   }
 
   return null;

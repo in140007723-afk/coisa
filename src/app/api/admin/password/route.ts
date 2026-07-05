@@ -17,7 +17,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, message: "Password must be at least 4 characters." }, { status: 400 });
     }
 
-    const token = getAdminSessionToken(request.headers.get("cookie") || "");
+    const token = getAdminSessionToken(request.headers.get("cookie") || "", request.headers.get("authorization") || "");
     if (!token) {
       return NextResponse.json({ success: false, message: "You need to be logged in to change the password." }, { status: 401 });
     }
