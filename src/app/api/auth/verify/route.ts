@@ -1,3 +1,5 @@
+export const maxDuration = 60; // Allows up to 60 seconds for cold starts
+
 import { NextResponse } from "next/server";
 import { getAdminSessionToken, verifySessionToken } from "@/lib/auth";
 
