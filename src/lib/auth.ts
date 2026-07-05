@@ -54,8 +54,14 @@ export function getAdminSessionToken(cookieHeader?: string | null) {
   for (const cookieName of ADMIN_SESSION_COOKIE_NAMES) {
     const cookie = cookies.find((part) => part.startsWith(`${cookieName}=`));
     if (cookie) {
-      return decodeURIComponent(cookie.slice(cookieName.length + 1));
+      const value = cookie.slice(cookieName.length + 1).trim();
+      return decodeURIComponent(value);
     }
+  }
+
+  const authHeader = cookieHeader.match(/authorization\s*=\s*([^;]+)/i);
+  if (authHeader?.[1]) {
+    return decodeURIComponent(authHeader[1].trim());
   }
 
   return null;
@@ -68,6 +74,7 @@ export function setAdminSessionCookie(response: { cookies: { set: (name: string,
     sameSite: "lax" as const,
     path: "/",
     maxAge: 60 * 60 * 8,
+    domain: undefined as string | undefined,
   };
 
   ADMIN_SESSION_COOKIE_NAMES.forEach((cookieName) => {

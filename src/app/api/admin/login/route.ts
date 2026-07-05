@@ -23,5 +23,6 @@ export async function POST(request: Request) {
   const response = NextResponse.json({ success: true, message: "Authenticated." });
   setAdminSessionCookie(response, token);
 
+  response.headers.set("Cache-Control", "no-store");
   return response;
 }
