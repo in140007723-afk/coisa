@@ -14,22 +14,29 @@ async function ensureUploadDirectory() {
 }
 
 export async function ensureUploadsTable() {
-  const result = await queryDb(`
-    CREATE TABLE IF NOT EXISTS uploads (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      filename VARCHAR(255) NOT NULL UNIQUE,
-      mimeType VARCHAR(50) NOT NULL,
-      data LONGBLOB NOT NULL,
-      createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
+  try {
+    // For CREATE TABLE IF NOT EXISTS, we need to execute directly from the pool
+    const connection = await import("./db").then(m => m.getDbConnection());
+    if (!connection) {
+      console.warn("[upload-storage] Database connection not available");
+      return false;
+    }
 
-  if (result === null) {
-    console.warn("[upload-storage] Database table creation failed or database not connected");
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS uploads (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        filename VARCHAR(255) NOT NULL UNIQUE,
+        mimeType VARCHAR(50) NOT NULL,
+        data LONGBLOB NOT NULL,
+        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    return true;
+  } catch (e) {
+    console.warn("[upload-storage] Database table creation failed:", e);
     return false;
   }
-
-  return true;
 }
 
 export async function saveUploadedFile(file: File) {
@@ -44,18 +51,29 @@ export async function saveUploadedFile(file: File) {
       const bytes = Buffer.from(await file.arrayBuffer());
       const base64Data = bytes.toString("base64");
 
-      const result = await queryDb(
-        "INSERT INTO uploads (filename, mimeType, data) VALUES (?, ?, ?)",
-        [uniqueName, file.type, base64Data]
-      );
+      console.log("[upload-storage] Attempting database insert for:", uniqueName, "mimeType:", file.type);
+      
+      // Use connection directly for INSERT to get the result properly
+      const { getDbConnection } = await import("./db");
+      const connection = await getDbConnection();
+      
+      if (connection) {
+        const [result] = await connection.execute(
+          "INSERT INTO uploads (filename, mimeType, data) VALUES (?, ?, ?)",
+          [uniqueName, file.type, base64Data] as never
+        );
 
-      if (result) {
-        console.log("[upload-storage] Image saved to database:", uniqueName);
-        return {
-          filename: uniqueName,
-          url: `${publicUrlPrefix}/${uniqueName}`,
-          storage: "database",
-        };
+        const resultObj = result as any;
+        console.log("[upload-storage] Database insert result:", { affectedRows: resultObj?.affectedRows, insertId: resultObj?.insertId });
+        
+        if (resultObj?.affectedRows > 0) {
+          console.log("[upload-storage] Image saved to database:", uniqueName, "insertId:", resultObj.insertId);
+          return {
+            filename: uniqueName,
+            url: `${publicUrlPrefix}/${uniqueName}`,
+            storage: "database",
+          };
+        }
       }
     } catch (e) {
       console.error("[upload-storage] Database insert failed:", e);
