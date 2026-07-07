@@ -1,4 +1,3 @@
-import { queryDb } from "./db";
 import { promises as fs } from "fs";
 import path from "path";
 
@@ -103,15 +102,35 @@ export async function getUploadedFile(fileName: string) {
   const cleanedName = fileName.split("/").pop() || "";
 
   // Try database first
-  const result = await queryDb<any[]>(
-    "SELECT mimeType, data FROM uploads WHERE filename = ?",
-    [cleanedName]
-  );
+  const { getDbConnection } = await import("./db");
+  const connection = await getDbConnection();
+  
+  if (connection) {
+    try {
+      const [rows] = await connection.execute<any[]>(
+        "SELECT mimeType, data FROM uploads WHERE filename = ?",
+        [cleanedName]
+      );
 
-  if (result && result.length > 0) {
-    const { mimeType, data } = result[0];
-    const buffer = Buffer.from(data, "base64");
-    return { mimeType, buffer, storage: "database" };
+      if (Array.isArray(rows) && rows.length > 0) {
+        const { mimeType, data } = rows[0];
+        
+        // Handle both Buffer and string cases
+        let buffer: Buffer;
+        if (Buffer.isBuffer(data)) {
+          buffer = data;
+        } else if (typeof data === "string") {
+          buffer = Buffer.from(data, "base64");
+        } else {
+          throw new Error("Unexpected data format from database");
+        }
+
+        console.log("[upload-storage] Image retrieved from database:", cleanedName, "size:", buffer.length);
+        return { mimeType, buffer, storage: "database" };
+      }
+    } catch (e) {
+      console.error("[upload-storage] Database query failed:", cleanedName, e);
+    }
   }
 
   // Fallback to filesystem

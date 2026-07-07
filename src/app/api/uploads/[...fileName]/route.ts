@@ -12,7 +12,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ file
     }
 
     const { mimeType, buffer } = uploadedFile;
-    return new NextResponse(buffer, {
+    return new NextResponse(buffer as unknown as ArrayBuffer, {
       status: 200,
       headers: {
         "Content-Type": mimeType,
