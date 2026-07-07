@@ -27,7 +27,7 @@ export async function GET() {
     return NextResponse.json({
       status: "connected",
       testQuery: result,
-      uploadsTableExists: tableCheck && tableCheck.length > 0,
+      uploadsTableExists: Array.isArray(tableCheck) && tableCheck.length > 0,
       env: {
         DB_HOST: process.env.DB_HOST,
         DB_USER: process.env.DB_USER,
