@@ -2,7 +2,7 @@ import { createHmac, randomBytes, timingSafeEqual } from "crypto";
 import bcrypt from "bcryptjs";
 
 const SESSION_SECRET = process.env.ADMIN_SESSION_SECRET || process.env.JWT_SECRET || "coisa-admin-secret";
-const ADMIN_SESSION_COOKIE_NAMES = ["admin_session", "coisa_admin_token"];
+const ADMIN_SESSION_COOKIE_NAMES = ["admin_session", "coisa_admin_token", "admin_token"];
 const IS_PRODUCTION = process.env.NODE_ENV === "production";
 
 function buildCookieOptions(maxAge = 60 * 60 * 8) {

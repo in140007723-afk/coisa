@@ -7,7 +7,9 @@ import { getAdminSessionToken, verifySessionToken } from "@/lib/auth";
 export async function GET(request: NextRequest) {
   const cookieHeader = request.headers.get("cookie") || "";
   const authHeader = request.headers.get("authorization") || "";
-  const cookieToken = request.cookies.get("coisa_admin_token")?.value || request.cookies.get("admin_session")?.value || null;
+  const cookieToken = ["admin_session", "coisa_admin_token", "admin_token"]
+    .map((name) => request.cookies.get(name)?.value)
+    .find(Boolean) || null;
   const token = cookieToken || getAdminSessionToken(cookieHeader, authHeader);
 
   if (!token) {
