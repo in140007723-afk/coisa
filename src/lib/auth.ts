@@ -1,8 +1,19 @@
 import { createHmac, randomBytes, timingSafeEqual } from "crypto";
 import bcrypt from "bcryptjs";
 
-const SESSION_SECRET = process.env.ADMIN_SESSION_SECRET || "coisa-admin-secret";
+const SESSION_SECRET = process.env.ADMIN_SESSION_SECRET || process.env.JWT_SECRET || "coisa-admin-secret";
 const ADMIN_SESSION_COOKIE_NAMES = ["admin_session", "coisa_admin_token"];
+const IS_PRODUCTION = process.env.NODE_ENV === "production";
+
+function buildCookieOptions(maxAge = 60 * 60 * 8) {
+  return {
+    httpOnly: true,
+    secure: IS_PRODUCTION,
+    sameSite: "lax" as const,
+    path: "/",
+    maxAge,
+  };
+}
 
 export async function hashPassword(password: string) {
   return bcrypt.hash(password, 10);
@@ -53,7 +64,7 @@ export function getAdminSessionToken(cookieHeader?: string | null, authHeader?: 
   if (authHeader) {
     const headerValue = authHeader.replace(/^Bearer\s+/i, "").trim();
     if (headerValue) {
-      return decodeURIComponent(headerValue);
+      return decodeURIComponent(headerValue.replace(/^"|"$/g, ""));
     }
   }
 
@@ -61,12 +72,12 @@ export function getAdminSessionToken(cookieHeader?: string | null, authHeader?: 
     return null;
   }
 
-  const cookies = cookieHeader.split(";").map((part) => part.trim());
+  const cookies = cookieHeader.split(";").map((part) => part.trim()).filter(Boolean);
   for (const cookieName of ADMIN_SESSION_COOKIE_NAMES) {
     const cookie = cookies.find((part) => part.startsWith(`${cookieName}=`));
     if (cookie) {
       const value = cookie.slice(cookieName.length + 1).trim();
-      return decodeURIComponent(value);
+      return decodeURIComponent(value.replace(/^"|"$/g, ""));
     }
   }
 
@@ -74,30 +85,13 @@ export function getAdminSessionToken(cookieHeader?: string | null, authHeader?: 
 }
 
 export function setAdminSessionCookie(response: { cookies: { set: (name: string, value: string, options: Record<string, unknown>) => void } }, token: string) {
-  const options = {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax" as const,
-    path: "/",
-    maxAge: 60 * 60 * 8,
-    domain: undefined as string | undefined,
-  };
-
   ADMIN_SESSION_COOKIE_NAMES.forEach((cookieName) => {
-    response.cookies.set(cookieName, token, options);
+    response.cookies.set(cookieName, token, buildCookieOptions());
   });
 }
 
 export function clearAdminSessionCookie(response: { cookies: { set: (name: string, value: string, options: Record<string, unknown>) => void } }) {
-  const options = {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax" as const,
-    path: "/",
-    maxAge: 0,
-  };
-
   ADMIN_SESSION_COOKIE_NAMES.forEach((cookieName) => {
-    response.cookies.set(cookieName, "", options);
+    response.cookies.set(cookieName, "", { ...buildCookieOptions(0), maxAge: 0 });
   });
 }

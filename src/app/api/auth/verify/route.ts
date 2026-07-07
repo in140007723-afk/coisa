@@ -1,12 +1,14 @@
 export const maxDuration = 60; // Allows up to 60 seconds for cold starts
 
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import { getAdminSessionToken, verifySessionToken } from "@/lib/auth";
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   const cookieHeader = request.headers.get("cookie") || "";
   const authHeader = request.headers.get("authorization") || "";
-  const token = getAdminSessionToken(cookieHeader, authHeader);
+  const cookieToken = request.cookies.get("coisa_admin_token")?.value || request.cookies.get("admin_session")?.value || null;
+  const token = cookieToken || getAdminSessionToken(cookieHeader, authHeader);
 
   if (!token) {
     return NextResponse.json({ success: false, error: "No auth token" }, { status: 401 });
