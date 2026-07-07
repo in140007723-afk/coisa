@@ -164,13 +164,29 @@ export default function AdminProductsPage() {
           </div>
           {uploading ? <p className="text-sm text-cyan-300">Uploading image...</p> : null}
           {form.images.length ? (
-            <div className="flex flex-wrap gap-2">
-              {form.images.map((image) => (
-                <div key={image} className="relative h-16 w-16">
-                  <img src={image} alt="Product preview" className="h-16 w-16 rounded-xl object-cover" onError={(e) => { e.currentTarget.src = '/images/tech-showcase.svg'; }} />
-                  <button type="button" onClick={() => setForm((current) => ({ ...current, images: current.images.filter(img => img !== image) }))} className="absolute -top-2 -right-2 bg-rose-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">×</button>
-                </div>
-              ))}
+            <div className="space-y-3">
+              <p className="text-sm font-medium text-slate-100">Image Preview ({form.images.length})</p>
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                {form.images.map((image) => (
+                  <div key={image} className="group relative aspect-square overflow-hidden rounded-xl border border-slate-700 bg-slate-800">
+                    <img 
+                      src={image} 
+                      alt="Product preview" 
+                      className="h-full w-full object-cover group-hover:scale-105 transition-transform" 
+                      onError={(e) => { e.currentTarget.src = '/images/tech-showcase.svg'; }} 
+                    />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <button 
+                        type="button" 
+                        onClick={() => setForm((current) => ({ ...current, images: current.images.filter(img => img !== image) }))} 
+                        className="bg-rose-500 hover:bg-rose-600 text-white rounded-full w-10 h-10 flex items-center justify-center text-lg font-bold transition-colors"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           ) : null}
           <button type="submit" className="w-full rounded-2xl bg-gradient-to-r from-[#0066FF] to-[#00C2FF] px-4 py-3 font-semibold text-white">{editingId ? "Update Product" : "Save Product"}</button>

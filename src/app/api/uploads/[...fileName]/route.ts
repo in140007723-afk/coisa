@@ -20,7 +20,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ file
       },
     });
   } catch (error) {
-    console.error("[uploads] error:", error);
-    return NextResponse.json({ error: "Image not found" }, { status: 404 });
+    console.error("[uploads-api] error:", error);
+    return NextResponse.json({ error: "Failed to retrieve image" }, { status: 500 });
   }
 }

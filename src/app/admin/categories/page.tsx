@@ -87,7 +87,28 @@ export default function AdminCategoriesPage() {
           <button type="submit" className="w-full rounded-2xl bg-gradient-to-r from-[#0066FF] to-[#00C2FF] px-4 py-3 font-semibold text-white">{editingId ? "Update Category" : "Save Category"}</button>
         </div>
         <div className="rounded-2xl border border-slate-800 bg-slate-950/80 p-4">
-          {form.image ? <img src={form.image} alt="Category preview" className="h-48 w-full rounded-2xl object-cover" /> : <div className="flex h-48 items-center justify-center rounded-2xl border border-dashed border-slate-700 text-sm text-slate-500">Image preview</div>}
+          <p className="text-xs font-medium text-slate-400 mb-3 uppercase tracking-wider">Image Preview</p>
+          {form.image ? (
+            <div className="relative group">
+              <img 
+                src={form.image} 
+                alt="Category preview" 
+                className="h-48 w-full rounded-2xl object-cover group-hover:opacity-90 transition-opacity" 
+                onError={(e) => { e.currentTarget.src = '/images/tech-showcase.svg'; }}
+              />
+              <button
+                type="button"
+                onClick={() => setForm({ ...form, image: "" })}
+                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 bg-rose-500 hover:bg-rose-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-lg font-bold transition-all"
+              >
+                ×
+              </button>
+            </div>
+          ) : (
+            <div className="flex h-48 items-center justify-center rounded-2xl border border-dashed border-slate-700 text-sm text-slate-500">
+              Upload an image to preview
+            </div>
+          )}
         </div>
       </form>
 
