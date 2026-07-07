@@ -17,7 +17,8 @@ export async function POST(request: Request) {
 
     const result = await saveUploadedFile(file);
     return NextResponse.json({ success: true, url: result.url, filename: result.filename });
-  } catch {
+  } catch (error) {
+    console.error("[upload] error:", error);
     return NextResponse.json({ success: false, message: "Upload failed" }, { status: 500 });
   }
 }

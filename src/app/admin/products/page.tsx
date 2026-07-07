@@ -166,7 +166,10 @@ export default function AdminProductsPage() {
           {form.images.length ? (
             <div className="flex flex-wrap gap-2">
               {form.images.map((image) => (
-                <img key={image} src={image} alt="Product preview" className="h-16 w-16 rounded-xl object-cover" />
+                <div key={image} className="relative h-16 w-16">
+                  <img src={image} alt="Product preview" className="h-16 w-16 rounded-xl object-cover" onError={(e) => { e.currentTarget.src = '/images/tech-showcase.svg'; }} />
+                  <button type="button" onClick={() => setForm((current) => ({ ...current, images: current.images.filter(img => img !== image) }))} className="absolute -top-2 -right-2 bg-rose-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">×</button>
+                </div>
               ))}
             </div>
           ) : null}

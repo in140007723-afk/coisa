@@ -210,7 +210,7 @@ function makeCategorySlug(value: string) {
 }
 
 function mapProduct(row: Record<string, any>): Product {
-  const fallbackImages = parseImageArray(row.images) || (row.image_url ? [row.image_url] : row.image ? [row.image] : []);
+  const primaryImage = row.image_url || row.image || "";
   return {
     id: String(row.id),
     name: row.name || "",
@@ -223,7 +223,7 @@ function mapProduct(row: Record<string, any>): Product {
     price: Number(row.price || 0),
     discountPrice: Number(row.discount_price || 0),
     stockQuantity: Number(row.stock_quantity || row.stock || 0),
-    images: fallbackImages.map((image: string) => (image.startsWith("/api/uploads/") ? image : image)),
+    images: primaryImage ? [primaryImage] : [],
     featured: Boolean(row.featured),
     status: (row.status as Product["status"]) || (row.item_condition as Product["status"]) || "active",
     sku: row.sku || "",
@@ -272,21 +272,7 @@ export async function verifyAdminPassword(password: string, hash: string) {
 
 export async function getProducts(params?: { search?: string; category?: string; brand?: string; availability?: string; sort?: string; limit?: number }) {
   const rows = await queryDb<any[]>("SELECT * FROM products ORDER BY created_at DESC");
-  const imageRows = await queryDb<any[]>("SELECT product_id, image FROM product_images ORDER BY id ASC");
-  const imagesByProductId = new Map<string, string[]>();
-  (imageRows || []).forEach((imageRow) => {
-    const productId = String(imageRow.product_id || "");
-    if (!productId) return;
-    const currentImages = imagesByProductId.get(productId) || [];
-    currentImages.push(String(imageRow.image || ""));
-    imagesByProductId.set(productId, currentImages.filter(Boolean));
-  });
-  let products = rows && rows.length ? rows.map((row) => {
-    const mapped = mapProduct(row);
-    const attachedImages = imagesByProductId.get(String(row.id)) || [];
-    if (attachedImages.length) mapped.images = attachedImages;
-    return mapped;
-  }) : fallbackState.products;
+  let products = rows && rows.length ? rows.map(mapProduct) : fallbackState.products;
   if ((!rows || !rows.length) && (!products || !products.length)) {
     const persisted = readPersistedProducts();
     if (persisted && persisted.length) products = persisted;
@@ -334,12 +320,6 @@ export async function createProduct(product: Omit<Product, "id" | "createdAt">) 
   const conditionValue = product.status === "active" ? "Brand New" : product.status;
   const insertResult = await queryDb<any>("INSERT INTO products (name, category_id, category, brand, model, price, discount_price, stock_quantity, stock, status, description, image_url, slug, featured, tags, specifications, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())", [product.name, normalizedCategoryId, categoryValue, product.brand, product.model, product.price, product.discountPrice || 0, stockValue, stockValue, conditionValue, product.description, imageValue, slugValue, product.featured ? 1 : 0, (product.tags || []).join(","), product.specifications,]);
   if (insertResult && typeof insertResult === "object" && "insertId" in insertResult) {
-    const insertId = Number((insertResult as any).insertId);
-    if (insertId) {
-      for (const image of imagesToStore) {
-        await queryDb<any>("INSERT INTO product_images (product_id, image) VALUES (?, ?)", [insertId, image]);
-      }
-    }
     const created = {
       ...product,
       id: String((insertResult as any).insertId),
@@ -364,12 +344,6 @@ export async function updateProduct(id: string, updates: Partial<Product>) {
   const normalizedCategoryId = normalizeCategoryId(updates.categoryId);
   const conditionValue = updates.status === "active" ? "Brand New" : updates.status;
   const updateResult = await queryDb<any>("UPDATE products SET name = ?, category_id = ?, category = ?, brand = ?, model = ?, price = ?, discount_price = ?, stock_quantity = ?, stock = ?, status = ?, description = ?, image_url = ?, slug = ?, featured = ?, tags = ?, specifications = ? WHERE id = ?", [updates.name, normalizedCategoryId, categoryValue, updates.brand, updates.model, updates.price, updates.discountPrice || 0, stockValue, stockValue, conditionValue, updates.description, imageValue, slugValue, updates.featured ? 1 : 0, (updates.tags || []).join(","), updates.specifications, id]);
-  if (id) {
-    await queryDb<any>("DELETE FROM product_images WHERE product_id = ?", [id]);
-    for (const image of imagesToStore) {
-      await queryDb<any>("INSERT INTO product_images (product_id, image) VALUES (?, ?)", [id, image]);
-    }
-  }
   if (updateResult && typeof updateResult === "object") {
     const existing = fallbackState.products.find((item) => item.id === id);
     if (existing) {
