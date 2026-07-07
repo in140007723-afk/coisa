@@ -210,6 +210,7 @@ function makeCategorySlug(value: string) {
 }
 
 function mapProduct(row: Record<string, any>): Product {
+  const fallbackImages = parseImageArray(row.images) || (row.image_url ? [row.image_url] : row.image ? [row.image] : []);
   return {
     id: String(row.id),
     name: row.name || "",
@@ -222,7 +223,7 @@ function mapProduct(row: Record<string, any>): Product {
     price: Number(row.price || 0),
     discountPrice: Number(row.discount_price || 0),
     stockQuantity: Number(row.stock_quantity || row.stock || 0),
-    images: parseImageArray(row.images) || (row.image_url ? [row.image_url] : row.image ? [row.image] : []),
+    images: fallbackImages.map((image: string) => (image.startsWith("/api/uploads/") ? image : image)),
     featured: Boolean(row.featured),
     status: (row.status as Product["status"]) || (row.item_condition as Product["status"]) || "active",
     sku: row.sku || "",
@@ -324,7 +325,8 @@ export async function getProducts(params?: { search?: string; category?: string;
 }
 
 export async function createProduct(product: Omit<Product, "id" | "createdAt">) {
-  const imageValue = Array.isArray(product.images) && product.images.length ? product.images[0] : "";
+  const imagesToStore = Array.isArray(product.images) ? product.images.filter(Boolean) : [];
+  const imageValue = imagesToStore[0] || "";
   const slugValue = slugify(product.name || "");
   const categoryValue = product.categoryName || product.categoryId || "General";
   const stockValue = Number(product.stockQuantity ?? product.quantity ?? 0);
@@ -334,7 +336,6 @@ export async function createProduct(product: Omit<Product, "id" | "createdAt">) 
   if (insertResult && typeof insertResult === "object" && "insertId" in insertResult) {
     const insertId = Number((insertResult as any).insertId);
     if (insertId) {
-      const imagesToStore = Array.isArray(product.images) ? product.images.filter(Boolean) : [];
       for (const image of imagesToStore) {
         await queryDb<any>("INSERT INTO product_images (product_id, image) VALUES (?, ?)", [insertId, image]);
       }
@@ -355,7 +356,8 @@ export async function createProduct(product: Omit<Product, "id" | "createdAt">) 
 }
 
 export async function updateProduct(id: string, updates: Partial<Product>) {
-  const imageValue = Array.isArray(updates.images) && updates.images.length ? updates.images[0] : "";
+  const imagesToStore = Array.isArray(updates.images) ? updates.images.filter(Boolean) : [];
+  const imageValue = imagesToStore[0] || "";
   const slugValue = updates.name ? slugify(updates.name) : undefined;
   const categoryValue = updates.categoryName || updates.categoryId || "General";
   const stockValue = Number(updates.stockQuantity ?? updates.quantity ?? 0);
@@ -364,7 +366,6 @@ export async function updateProduct(id: string, updates: Partial<Product>) {
   const updateResult = await queryDb<any>("UPDATE products SET name = ?, category_id = ?, category = ?, brand = ?, model = ?, price = ?, discount_price = ?, stock_quantity = ?, stock = ?, status = ?, description = ?, image_url = ?, slug = ?, featured = ?, tags = ?, specifications = ? WHERE id = ?", [updates.name, normalizedCategoryId, categoryValue, updates.brand, updates.model, updates.price, updates.discountPrice || 0, stockValue, stockValue, conditionValue, updates.description, imageValue, slugValue, updates.featured ? 1 : 0, (updates.tags || []).join(","), updates.specifications, id]);
   if (id) {
     await queryDb<any>("DELETE FROM product_images WHERE product_id = ?", [id]);
-    const imagesToStore = Array.isArray(updates.images) ? updates.images.filter(Boolean) : [];
     for (const image of imagesToStore) {
       await queryDb<any>("INSERT INTO product_images (product_id, image) VALUES (?, ?)", [id, image]);
     }
