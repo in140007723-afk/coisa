@@ -78,6 +78,16 @@ CREATE TABLE IF NOT EXISTS enquiries (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Uploads table for storing image data (Vercel-compatible)
+CREATE TABLE IF NOT EXISTS uploads (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  filename VARCHAR(255) NOT NULL UNIQUE,
+  mimeType VARCHAR(50) NOT NULL DEFAULT 'image/jpeg',
+  data LONGBLOB NOT NULL,
+  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_uploads_filename (filename)
+);
+
 INSERT INTO admins (name, email, password, role)
 VALUES (
   'System Admin',
